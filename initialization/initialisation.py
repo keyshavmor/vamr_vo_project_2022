@@ -13,3 +13,12 @@
 #       transformation_matrix : Dimension - 4x4, transform from image frame to 3D world co-ordination system
 #       initial_keypoints     : Dimension - Nx2, N is number of keypoints. Initial keypoints in the image plane                   
 #       initial_landmarks     : Dimension - Nx2, N is number of landmarks. initial landmarks which where triangulated from intial keypoints.
+
+# Initialisation algorithm
+
+# 1. Detect keypoints from the two input images and camera parameters of the initial frame
+# 2. Obtain Keypoint descriptors
+# 3. Match keypoints in the two images
+# 4. Compute relative pose of second image with previous image
+# 5. Traingulate landmarks in the images
+# 6. Plot matched features and keypoints
