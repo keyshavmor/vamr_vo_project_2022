@@ -22,3 +22,10 @@
 # 4. Compute relative pose of second image with previous image
 # 5. Traingulate landmarks in the images
 # 6. Plot matched features and keypoints
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Detect keypoints in the two images
+
