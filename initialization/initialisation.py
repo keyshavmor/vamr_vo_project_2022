@@ -23,7 +23,7 @@
 # 5. Traingulate landmarks in the images
 # 6. Plot matched features and keypoints
 
-import cv2
+import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
