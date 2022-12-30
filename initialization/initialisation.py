@@ -63,5 +63,34 @@ def init(dataset_params):
         cv.destroyWindow("Image")
 
     # Detect keypoints
-
     keypoints_0, keypoint_1 = detect_keypoints(image_0, image_1, dataset_params)
+
+    # Descriptor keypoints
+    descriptor_0, valid_kp_0, descriptor_1, valid_kp_1 = descriptor_keypoints(image_0, image_1, keypoints_0, keypoint_1, dataset_params)
+
+    # Match Keypoints
+    matched_kp_0, matched_kp_1 = match_keypoints(image_0, image_1, valid_kp_0, valid_kp_1, descriptor_0, descriptor_1, params)
+
+    # Compute relative pose of second image
+    orientation, localization, inliers = relative_pose(image_0, image_1, matched_kp_0, matched_kp_1, dataset_params)
+
+    # Triangulate landmarks from matched keypoints
+    transformation_matrix, initial_landmarks = triangulate(matched_kp_0, matched_kp_1, inliers, orientation, localization, dataset_params)
+
+    #Visualise matched features and inliers
+
+    # Use cv2.drawMatches to display the matched keypoints
+    matched_features = cv2.drawMatches(image_0, matched_kp_0, image_1, matched_kp_1, None)
+
+    # Display the output image
+    cv2.imshow("Matched keypoints", matched_features)
+    cv2.waitKey(1000)
+    cv2.destroyWindow("Matched keypoints")
+
+    # Use cv2.drawMatches to display the inlier matched keypoints
+    matched_inliers = cv2.drawMatches(image_0, matched_kp_0, image_1, matched_kp_1, inliers, None)
+
+    # Display the output image
+    cv2.imshow("Matched inliers", matched_inliers)
+    cv2.waitKey(1000)
+    cv2.destroyWindow("Matched inliers")
