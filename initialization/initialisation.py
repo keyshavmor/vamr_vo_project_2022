@@ -62,4 +62,6 @@ def init(dataset_params):
         cv.waitKey(1000)
         cv.destroyWindow("Image")
 
-        
+    # Detect keypoints
+
+    keypoints_0, keypoint_1 = detect_keypoints(image_0, image_1, dataset_params)
