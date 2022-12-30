@@ -3,8 +3,14 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-
+import sys
 import dataset_params
+import re
+
+# Add path to initialisation code and dataset
+sys.path.append('initialization')
+
+import initialisation
 
 # We implement the visual odometry pipeline initially only for 3 datasets
 
@@ -15,9 +21,39 @@ user_dataset = input("Pick User Dataset (parking, KITTI, Malaga): ")
 
 current_dataset = user_dataset
 
+def convert_txt_to_array(path):
+
+    if(path == 'initialization/test_dataset_parking/poses.txt'):
+        matrix = np.zeros((1,12))
+    else:
+        matrix = np.zeros((1,3))
+
+    # Open the text file
+    with open(path, 'r') as file:
+    
+        # Read the contents of the file into a list of strings and convert them to a matrix
+        data = file.readlines()
+        for val in data:
+            values = [float(x) for x in re.findall(r'[-+]?\d*\.\d+|\d+', val)]
+            array = np.array(values, dtype='float64')
+            matrix = np.vstack((matrix, array))
+        matrix = np.delete(matrix, 0, axis=0)
+
+    return matrix
+
 if(current_dataset == "parking"):
 
     params = dataset_params.parking_dataset_parameters()
-    print(params)
+    params["dataset"] = current_dataset
+
+    K = convert_txt_to_array("initialization/test_dataset_parking/K.txt")
+    params["K"] = K
+
+    ground_truth_poses = convert_txt_to_array("initialization/test_dataset_parking/poses.txt")
+    ground_truth_poses = ground_truth_poses[:, -9:]
+    print(ground_truth_poses)
+    params["ground_truth_poses"] = ground_truth_poses
+
+    initialisation.init(params)
 else:
     print("Program not yet defined for this dataset")
