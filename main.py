@@ -43,6 +43,8 @@ def convert_txt_to_array(path):
 
 if(current_dataset == "parking"):
 
+    # Obtain initial parameters, camera calibration and pose matrix to initialise pipeline
+
     params = dataset_params.parking_dataset_parameters()
     params["dataset"] = current_dataset
 
@@ -51,9 +53,9 @@ if(current_dataset == "parking"):
 
     ground_truth_poses = convert_txt_to_array("initialization/test_dataset_parking/poses.txt")
     ground_truth_poses = ground_truth_poses[:, -9:]
-    print(ground_truth_poses)
     params["ground_truth_poses"] = ground_truth_poses
 
+    #Initialise pipeline and obtain homography matrix among other values
     initialisation.init(params)
 else:
     print("Program not yet defined for this dataset")

@@ -29,4 +29,37 @@ import matplotlib.pyplot as plt
 
 # Detect keypoints in the two images
 def init(dataset_params):
-    pass
+
+    if(dataset_params["dataset"] == "parking"):
+        path = dataset_params["path"]
+        path += '/img_'
+
+        index = dataset_params["img_idx_0"]
+        final_img_index_0 = 0 + index
+        string = str(final_img_index_0).zfill(5)
+        path += string
+        path += '.png'
+    
+        # Obtain Keyframe 0
+        image = cv.imread(path)
+        image_0 = image.astype(np.uint8)
+        cv.imshow("Image", image_0)
+        cv.waitKey(1000)
+        cv.destroyWindow("Image")
+
+        path = dataset_params["path"]
+        path += '/img_'
+        index = dataset_params["img_idx_1"]
+        final_img_index_1 = 0 + index
+        string = str(final_img_index_1).zfill(5)
+        path += string
+        path += '.png'
+
+        # Obtain Keyframe 1
+        image = cv.imread(path)
+        image_1 = image.astype(np.uint8)
+        cv.imshow("Image", image_1)
+        cv.waitKey(1000)
+        cv.destroyWindow("Image")
+
+        
