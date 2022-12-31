@@ -15,7 +15,7 @@ def parking_dataset_parameters():
 
     # Frame selection
     m = 0 # Keyframe image 1
-    n = 15 # Keyframe image 3
+    n = 3 # Keyframe image 3
 
     parking_params["img_idx_0"] = m
     parking_params["img_idx_1"] = n

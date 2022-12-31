@@ -108,21 +108,48 @@ def detect_keypoints_descriptors(image_0, image_1):
 
     return valid_kp_0, valid_kp_1, img0_sift, img1_sift, descriptor_0, descriptor_1
 
-#def descriptor_keypoints(image_0, image_1, keypoints_0, keypoint_1):
-    
-    # Create a SIFT descriptor object
-#    sift_0 = cv.SIFT_create()
+def match_keypoints(image_0, image_1, valid_kp_0, valid_kp_1, descriptor_0, descriptor_1):
 
-    # Compute feature vectors (descriptors) for the corner points
-#    valid_kp_0, descriptor_0 = sift_0.compute(image_0, keypoints_0)
+    # Match the keypoints between the two images using a brute-force matcher
+    bf = cv.BFMatcher()
+    matches = bf.knnMatch(descriptor_0, descriptor_1, k=2)
 
-    # Create a SIFT descriptor object
-#    sift_1 = cv.SIFT_create()
+    # Use Lowe's ratio test to filter out false matches
+    good_matches = []
+    for m, n in matches:
+        if m.distance < 0.7 * n.distance:
+            good_matches.append(m)
 
-    # Compute feature vectors (descriptors) for the corner points
-#    valid_kp_1, descriptor_1 = sift_1.compute(image_1, keypoints_1)
+    print(len(good_matches))
 
-#    return descriptor_0, valid_kp_0, descriptor_1, valid_kp_1
+    # Draw the matches on top of the images using the drawMatches function
+    img_matches = cv.drawMatches(image_0, valid_kp_0, image_1, valid_kp_1, good_matches, None, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+    # Display the resulting image
+    cv.imshow('Matched Keypoints', img_matches)
+    cv.waitKey(10000)
+    cv.destroyWindow('Matched Keypoints')
+
+    return good_matches
+
+def compute_relative_pose(image_0, image_1, keypoints_0, keypoints_1, matched_kp, dataset_params):
+
+    # Extract matched keypoints
+    pts_0 = np.float32([keypoints_0[m.queryIdx].pt for m in matched_kp]).reshape(-1, 1, 2)
+    pts_1 = np.float32([keypoints_1[m.trainIdx].pt for m in matched_kp]).reshape(-1, 1, 2)
+
+    # Estimate fundamental matrix using RANSAC
+    F, mask = cv.findFundamentalMat(pts_0, pts_1, cv.FM_RANSAC, confidence=0.99, )
+
+    # We select only inlier points
+    inlier_pts0 = pts_0[mask.ravel()==1]
+    inlier_pts1 = pts_1[mask.ravel()==1]
+
+    K = dataset_params["K"]
+
+    # Compute the relative pose between the two cameras
+    _, R, t, mask = cv.recoverPose(F, inlier_pts0, inlier_pts1, K)
+
 
 
 # Detect keypoints in the two images
@@ -161,13 +188,13 @@ def init(dataset_params):
         cv.destroyWindow("Image")
 
     # Detect keypoints
-    keypoints_0, keypoint_1, image_0, image_1, descriptor_0, descriptor_1 = detect_keypoints_descriptors(image_0, image_1)
+    keypoints_0, keypoints_1, image_0, image_1, descriptor_0, descriptor_1 = detect_keypoints_descriptors(image_0, image_1)
 
     # Match Keypoints
-    #matched_kp_0, matched_kp_1 = match_keypoints(image_0, image_1, valid_kp_0, valid_kp_1, descriptor_0, descriptor_1, params)
+    matched_kp = match_keypoints(image_0, image_1, keypoints_0, keypoints_1, descriptor_0, descriptor_1)
 
     # Compute relative pose of second image
-    #orientation, localization, inliers = relative_pose(image_0, image_1, matched_kp_0, matched_kp_1, dataset_params)
+    orientation, localization, inliers = compute_relative_pose(image_0, image_1, keypoints_0, keypoints_1, matched_kp, dataset_params)
 
     # Triangulate landmarks from matched keypoints
     #transformation_matrix, initial_landmarks = triangulate(matched_kp_0, matched_kp_1, inliers, orientation, localization, dataset_params)
