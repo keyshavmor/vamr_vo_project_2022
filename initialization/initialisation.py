@@ -30,47 +30,6 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def detect_keypoints_descriptors(image_0, image_1):
 
-    corner_points_0 = cv.cornerHarris(image_0, 2, 3, 0.04)
-    threshold_factor_0 = (0.0000001)/(corner_points_0.max()) # KITTI = 0.0001 # Parking = 0.00000001
-    # Threshold the corner points
-    corner_points_0 = corner_points_0 > threshold_factor_0 * corner_points_0.max()
-
-    # Convert the corner points to coordinates
-    coords = np.column_stack(np.nonzero(corner_points_0))
-    image = cv.cvtColor(image_0, cv.COLOR_GRAY2RGB)
-    # Draw the corner points on the image
-    for coord in coords:
-        x, y = coord
-        image = cv.circle(image, (y, x), 1, (0, 0, 255), 1) # Co-ordinates need to be inverted to fit the image
-    # Display the image
-    cv.imshow('image', image)
-    cv.waitKey(1000)
-    cv.destroyWindow('image')
-
-    corner_points_1 = cv.cornerHarris(image_1, 2, 3, 0.04)
-    threshold_factor_1 = (0.0000001)/(corner_points_1.max()) # KITTI = 0.0001 # Parking = 0.00000001
-    # Threshold the corner points
-    corner_points_1 = corner_points_1 > threshold_factor_1 * corner_points_1.max()
-    # Convert the corner points to coordinates
-    coords = np.column_stack(np.nonzero(corner_points_1))
-    image = cv.cvtColor(image_1, cv.COLOR_GRAY2RGB)
-    # Draw the corner points on the image
-    for coord in coords:
-        x, y = coord
-        image = cv.circle(image, (y, x), 1, (0, 0, 255), 1) # Co-ordinates need to be inverted to fit the image
-    # Display the image
-    cv.imshow('image', image)
-    cv.waitKey(1000)
-    cv.destroyWindow('image')
-
-    # Create a list of keypoints from the corner points
-    keypoints_0 = []
-    for y in range(corner_points_0.shape[0]):
-        for x in range(corner_points_0.shape[1]):
-            if corner_points_0[y, x] > 0:
-                keypoint = cv.KeyPoint(x, y, size=10)
-                keypoints_0.append(keypoint)
-
     # Create a SIFT descriptor object
     sift = cv.SIFT_create()
 
