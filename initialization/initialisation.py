@@ -121,6 +121,16 @@ def triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, 
     M1 = np.float64(K @ np.eye(3,4))
     M2 = np.float64(K @ np.c_[R, t])
 
+    R_0_1 = np.linalg.inv(R)
+
+    relative_translation = -R_0_1.dot(t)
+    transformation_matrix = np.hstack((R_0_1,relative_translation))
+    transformation_matrix = np.vstack([transformation_matrix,[0, 0, 0, 1]])
+
+    det = np.linalg.det(transformation_matrix)
+
+    print('Determinant of Transformation Matrix:',det)
+
     inlier_pts0 = np.float64(np.squeeze(inlier_pts0))
     inlier_pts1 = np.float64(np.squeeze(inlier_pts1))
 
@@ -153,7 +163,7 @@ def triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, 
     cv.destroyWindow('Image 1')
     cv.destroyWindow('Image 2')
 
-    return P
+    return transformation_matrix, P
 
 
 # Detect keypoints in the two images
@@ -201,22 +211,4 @@ def init(dataset_params):
     R, t, inliers, inlier_pts0, inlier_pts1 = compute_relative_pose(image_0, image_1, keypoints_0, keypoints_1, matched_kp, dataset_params)
 
     # Triangulate landmarks from matched keypoints
-    initial_landmarks = triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, dataset_params, image_0, image_1)
-
-    #Visualise matched features and inliers
-
-    # Use cv2.drawMatches to display the matched keypoints
-    #matched_features = cv2.drawMatches(image_0, matched_kp_0, image_1, matched_kp_1, None)
-
-    # Display the output image
-    #cv2.imshow("Matched keypoints", matched_features)
-    #cv2.waitKey(1000)
-    #cv2.destroyWindow("Matched keypoints")
-
-    # Use cv2.drawMatches to display the inlier matched keypoints
-    #matched_inliers = cv2.drawMatches(image_0, matched_kp_0, image_1, matched_kp_1, inliers, None)
-
-    # Display the output image
-    #cv2.imshow("Matched inliers", matched_inliers)
-    #cv2.waitKey(1000)
-    #cv2.destroyWindow("Matched inliers")
+    transformation_matrix, initial_landmarks = triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, dataset_params, image_0, image_1)
