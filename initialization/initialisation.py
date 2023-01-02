@@ -36,14 +36,6 @@ def detect_keypoints_descriptors(image_0, image_1):
     # Compute feature vectors (descriptors) for the keypoints
     valid_kp_0, descriptor_0 = sift.detectAndCompute(image_0, None)
 
-    # Create a list of keypoints from the corner points
-    keypoints_1 = []
-    for y in range(corner_points_1.shape[0]):
-        for x in range(corner_points_1.shape[1]):
-            if corner_points_1[y, x] > 0:
-                keypoint = cv.KeyPoint(x, y, size=10)
-                keypoints_1.append(keypoint)
-
     # Create a SIFT descriptor object
     sift = cv.SIFT_create()
 
