@@ -28,6 +28,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+
 def detect_keypoints_descriptors(image_0, image_1):
 
     # Create a SIFT descriptor object
@@ -107,45 +108,52 @@ def compute_relative_pose(image_0, image_1, keypoints_0, keypoints_1, matched_kp
     ratio = np.count_nonzero(mask) / len(mask)
     print(f'Ratio of valid keypoints: {ratio}')
 
+    det = np.linalg.det(R)
+
+    print('Determinant of Rotation Matrix:',det)
+
     return R, t, mask_e, inlier_pts0, inlier_pts1
 
 def triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, dataset_params, image_0, image_1):
     # Compute the projection matrices.
     
     K = dataset_params["K"]
-    P1 = np.hstack((np.eye(3), np.zeros((3, 1))))
-    P1 = np.dot(K,P1)
-    T = np.hstack((R,t))
-    T - np.dot(K,T)
+    M1 = np.float64(K @ np.eye(3,4))
+    M2 = np.float64(K @ np.c_[R, t])
+
+    inlier_pts0 = np.float64(np.squeeze(inlier_pts0))
+    inlier_pts1 = np.float64(np.squeeze(inlier_pts1))
 
     # Triangulate the points.
-    points4D = cv.triangulatePoints(P1, T, inlier_pts0.T, inlier_pts1.T)
-
-    points3D = cv.convertPointsFromHomogeneous(points4D.T)
-
-    #squeeze_3d = np.squeeze(points3D)
+    points4D = cv.triangulatePoints(M1, M2, inlier_pts0.T, inlier_pts1.T)
+    P = points4D[:3, :] / points4D[3, :]
 
     # Project the 3D points onto the images
-    #img_pts, _ = cv.projectPoints(points3D, R, t, K, None)
+    img_pts, _ = cv.projectPoints(P, R, t, K, None)
 
     # Convert the projected points to integer coordinates
-    #img_pts = np.int32(img_pts).reshape(-1, 2)
+    img_pts = np.int32(img_pts).reshape(-1, 2)
 
+    # Convert the inlier points to keypoint types
+    kp0 = [cv.KeyPoint(x=p[0], y=p[1], size=20) for p in inlier_pts0]
+    kp1 = [cv.KeyPoint(x=p[0], y=p[1], size=20) for p in inlier_pts1]
 
     # Draw the keypoints and the projected points on the images
-    #image1 = cv.drawKeypoints(image_0, keypoints_0, None)
-    #image2 = cv.drawKeypoints(image_1, keypoints_1, None)
+    image1 = cv.drawKeypoints(image_0, kp0, None)
+    image2 = cv.drawKeypoints(image_1, kp1, None)
 
-    #for pt in img_pts:
-    #    cv.circle(image1, tuple(pt), 5, (0, 255, 0), -1)
-    #    cv.circle(image2, tuple(pt), 5, (0, 255, 0), -1)
+    for pt in img_pts:
+        cv.circle(image1, tuple(pt), 2, (0, 255, 0), -1)
+        cv.circle(image2, tuple(pt), 2, (0, 0, 255), -1)
 
     # Display the images
-    #cv.imshow('Image 1', image1)
-    #cv.imshow('Image 2', image2)
-    #cv.waitKey(30000)
-    #cv.destroyWindow('Image 1')
-    #cv.destroyWindow('Image 2')
+    cv.imshow('Image 1', image1)
+    cv.imshow('Image 2', image2)
+    cv.waitKey(1000)
+    cv.destroyWindow('Image 1')
+    cv.destroyWindow('Image 2')
+
+    return P
 
 
 # Detect keypoints in the two images
@@ -193,7 +201,7 @@ def init(dataset_params):
     R, t, inliers, inlier_pts0, inlier_pts1 = compute_relative_pose(image_0, image_1, keypoints_0, keypoints_1, matched_kp, dataset_params)
 
     # Triangulate landmarks from matched keypoints
-    transformation_matrix, initial_landmarks = triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, dataset_params, image_0, image_1)
+    initial_landmarks = triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, dataset_params, image_0, image_1)
 
     #Visualise matched features and inliers
 
