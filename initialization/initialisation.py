@@ -121,9 +121,15 @@ def triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, 
     M1 = np.float64(K @ np.eye(3,4))
     M2 = np.float64(K @ np.c_[R, t])
 
+
     R_0_1 = np.linalg.inv(R)
 
+    print(R_0_1)
+
     relative_translation = -R_0_1.dot(t)
+
+    print(relative_translation)
+
     transformation_matrix = np.hstack((R_0_1,relative_translation))
     transformation_matrix = np.vstack([transformation_matrix,[0, 0, 0, 1]])
 

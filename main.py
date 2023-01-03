@@ -9,8 +9,10 @@ import re
 
 # Add path to initialisation code and dataset
 sys.path.append('initialization')
-
 import initialisation
+
+sys.path.append('continuous_operation')
+import continuous_operation
 
 # We implement the visual odometry pipeline initially only for 3 datasets
 
@@ -56,6 +58,10 @@ if(current_dataset == "parking"):
     params["ground_truth_poses"] = ground_truth_poses
 
     #Initialise pipeline and obtain homography matrix among other values
-    initialisation.init(params)
+    transformation_matrix, initial_landmarks = initialisation.init(params)
+
+    #Call continuous operation pipeline
+
+
 else:
     print("Program not yet defined for this dataset")
