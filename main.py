@@ -68,29 +68,26 @@ if(current_dataset == "parking"):
         #Call continuous operation pipeline
         path = 'initialization/test_dataset_parking/img_'
         index = i
-        final_img_index_0 = 0 + index
-        string = str(final_img_index_0).zfill(5)
+        string = str(index).zfill(5)
         path += string
         path += '.png'
         image = cv.imread(path)
         image_0 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         cv.imshow("Image", image_0)
-        cv.waitKey(1000)
+        cv.waitKey(500)
         cv.destroyWindow("Image")
-
+        
+        path = 'initialization/test_dataset_parking/img_'
+        index = i+3
+        string = str(index).zfill(5)
+        path += string
+        path += '.png'
+        image = cv.imread(path)
+        image_1 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        cv.imshow("Image", image_1)
+        cv.destroyWindow("Image")
+        cv.waitKey(500)
         time.sleep(0.01)
-        #path = 'initialization/test_dataset_parking/img_'
-        #index = 6
-        #final_img_index_0 = 0 + index
-        #string = str(final_img_index_0).zfill(5)
-        #path += string
-        #path += '.png'
-        #image = cv.imread(path)
-        #image_1 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        #cv.imshow("Image", image_1)
-        #cv.waitKey(1000)
-        #cv.destroyWindow("Image")
-
     #S_curr, transformation_matrix = processFrame(img_curr, img_prev, S_prev, params, transformation_matrix)
 
 
