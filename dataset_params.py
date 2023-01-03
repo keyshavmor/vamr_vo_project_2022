@@ -19,6 +19,7 @@ def parking_dataset_parameters():
 
     parking_params["img_idx_0"] = m
     parking_params["img_idx_1"] = n
+    parking_params["last_frame"] = 598
 
     # Harris parameters
     corner_patch_size = 9

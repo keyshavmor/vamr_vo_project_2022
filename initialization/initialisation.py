@@ -124,11 +124,7 @@ def triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, 
 
     R_0_1 = np.linalg.inv(R)
 
-    print(R_0_1)
-
     relative_translation = -R_0_1.dot(t)
-
-    print(relative_translation)
 
     transformation_matrix = np.hstack((R_0_1,relative_translation))
     transformation_matrix = np.vstack([transformation_matrix,[0, 0, 0, 1]])
@@ -218,3 +214,5 @@ def init(dataset_params):
 
     # Triangulate landmarks from matched keypoints
     transformation_matrix, initial_landmarks = triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, dataset_params, image_0, image_1)
+
+    return transformation_matrix, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t

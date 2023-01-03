@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 import dataset_params
 import re
+import time
 
 # Add path to initialisation code and dataset
 sys.path.append('initialization')
@@ -58,9 +59,39 @@ if(current_dataset == "parking"):
     params["ground_truth_poses"] = ground_truth_poses
 
     #Initialise pipeline and obtain homography matrix among other values
-    transformation_matrix, initial_landmarks = initialisation.init(params)
+    transformation_matrix, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t = initialisation.init(params)
 
-    #Call continuous operation pipeline
+    parking_range = range(params["img_idx_1"], params["last_frame"]+1, 3)
+
+    for i in parking_range:
+    
+        #Call continuous operation pipeline
+        path = 'initialization/test_dataset_parking/img_'
+        index = i
+        final_img_index_0 = 0 + index
+        string = str(final_img_index_0).zfill(5)
+        path += string
+        path += '.png'
+        image = cv.imread(path)
+        image_0 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        cv.imshow("Image", image_0)
+        cv.waitKey(1000)
+        cv.destroyWindow("Image")
+
+        time.sleep(0.01)
+        #path = 'initialization/test_dataset_parking/img_'
+        #index = 6
+        #final_img_index_0 = 0 + index
+        #string = str(final_img_index_0).zfill(5)
+        #path += string
+        #path += '.png'
+        #image = cv.imread(path)
+        #image_1 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        #cv.imshow("Image", image_1)
+        #cv.waitKey(1000)
+        #cv.destroyWindow("Image")
+
+    #S_curr, transformation_matrix = processFrame(img_curr, img_prev, S_prev, params, transformation_matrix)
 
 
 else:
