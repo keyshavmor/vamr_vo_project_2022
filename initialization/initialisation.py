@@ -47,17 +47,17 @@ def detect_keypoints_descriptors(image_0, image_1):
     img0_sift = cv.drawKeypoints(image_0, valid_kp_0, None, flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     # Display the image
-    cv.imshow("SIFT Descriptors", img0_sift)
-    cv.waitKey(1000)
-    cv.destroyWindow("SIFT Descriptors")
+    #cv.imshow("SIFT Descriptors", img0_sift)
+    #cv.waitKey(1000)
+    #cv.destroyWindow("SIFT Descriptors")
 
     # Draw the keypoints and their descriptors on the image
     img1_sift = cv.drawKeypoints(image_1, valid_kp_1, None, flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     # Display the image
-    cv.imshow("SIFT Descriptors", img1_sift)
-    cv.waitKey(1000)
-    cv.destroyWindow("SIFT Descriptors")
+    #cv.imshow("SIFT Descriptors", img1_sift)
+    #cv.waitKey(1000)
+    #cv.destroyWindow("SIFT Descriptors")
 
     return valid_kp_0, valid_kp_1, descriptor_0, descriptor_1
 
@@ -73,15 +73,15 @@ def match_keypoints(image_0, image_1, valid_kp_0, valid_kp_1, descriptor_0, desc
         if m.distance < 0.8 * n.distance:
             good_matches.append(m)
 
-    print(len(good_matches))
+    print('Number of good keypoints:',len(good_matches))
 
     # Draw the matches on top of the images using the drawMatches function
     img_matches = cv.drawMatches(image_0, valid_kp_0, image_1, valid_kp_1, good_matches, None, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
     # Display the resulting image
-    cv.imshow('Matched Keypoints', img_matches)
-    cv.waitKey(1000)
-    cv.destroyWindow('Matched Keypoints')
+    #cv.imshow('Matched Keypoints', img_matches)
+    #cv.waitKey(1000)
+    #cv.destroyWindow('Matched Keypoints')
 
     return good_matches
 
@@ -147,23 +147,18 @@ def triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, 
     img_pts = np.int32(img_pts).reshape(-1, 2)
 
     # Convert the inlier points to keypoint types
-    kp0 = [cv.KeyPoint(x=p[0], y=p[1], size=20) for p in inlier_pts0]
     kp1 = [cv.KeyPoint(x=p[0], y=p[1], size=20) for p in inlier_pts1]
 
     # Draw the keypoints and the projected points on the images
-    image1 = cv.drawKeypoints(image_0, kp0, None)
     image2 = cv.drawKeypoints(image_1, kp1, None)
 
     for pt in img_pts:
-        cv.circle(image1, tuple(pt), 2, (0, 255, 0), -1)
         cv.circle(image2, tuple(pt), 2, (0, 0, 255), -1)
 
     # Display the images
-    cv.imshow('Image 1', image1)
-    cv.imshow('Image 2', image2)
-    cv.waitKey(1000)
-    cv.destroyWindow('Image 1')
-    cv.destroyWindow('Image 2')
+    #cv.imshow('Image 2', image2)
+    #cv.waitKey(1000)
+    #cv.destroyWindow('Image 2')
 
     return transformation_matrix, P
 
@@ -184,9 +179,9 @@ def init(dataset_params):
         # Obtain Keyframe 0
         image = cv.imread(path)
         image_0 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        cv.imshow("Image", image_0)
-        cv.waitKey(1000)
-        cv.destroyWindow("Image")
+        #cv.imshow("Image", image_0)
+        #cv.waitKey(1000)
+        #cv.destroyWindow("Image")
 
         path = dataset_params["path"]
         path += '/img_'
@@ -199,9 +194,9 @@ def init(dataset_params):
         # Obtain Keyframe 1
         image = cv.imread(path)
         image_1 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        cv.imshow("Image", image_1)
-        cv.waitKey(1000)
-        cv.destroyWindow("Image")
+        #cv.imshow("Image", image_1)
+        #cv.waitKey(1000)
+        #cv.destroyWindow("Image")
 
     # Detect keypoints
     keypoints_0, keypoints_1, descriptor_0, descriptor_1 = detect_keypoints_descriptors(image_0, image_1)
@@ -215,4 +210,4 @@ def init(dataset_params):
     # Triangulate landmarks from matched keypoints
     transformation_matrix, initial_landmarks = triangulate(matched_kp, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, dataset_params, image_0, image_1)
 
-    return transformation_matrix, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t
+    return transformation_matrix, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, initial_landmarks, descriptor_0, descriptor_1

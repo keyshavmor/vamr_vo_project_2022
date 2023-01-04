@@ -59,11 +59,11 @@ if(current_dataset == "parking"):
     params["ground_truth_poses"] = ground_truth_poses
 
     #Initialise pipeline and obtain homography matrix among other values
-    transformation_matrix, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t = initialisation.init(params)
+    transformation_matrix, inlier_pts0, inlier_pts1, keypoints_0, keypoints_1, inliers, R, t, initial_landmarks, descriptor_0, descriptor_1 = initialisation.init(params)
 
     parking_range = range(params["img_idx_1"], params["last_frame"]+1, 3)
 
-    for i in parking_range:
+    for i in range(3,594,3):
     
         #Call continuous operation pipeline
         path = 'initialization/test_dataset_parking/img_'
@@ -73,9 +73,9 @@ if(current_dataset == "parking"):
         path += '.png'
         image = cv.imread(path)
         image_0 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        cv.imshow("Image", image_0)
-        cv.waitKey(500)
-        cv.destroyWindow("Image")
+        #cv.imshow("Image", image_0)
+        #cv.waitKey(500)
+        #cv.destroyWindow("Image")
         
         path = 'initialization/test_dataset_parking/img_'
         index = i+3
@@ -84,11 +84,13 @@ if(current_dataset == "parking"):
         path += '.png'
         image = cv.imread(path)
         image_1 = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        cv.imshow("Image", image_1)
-        cv.destroyWindow("Image")
-        cv.waitKey(500)
-        time.sleep(0.01)
-    #S_curr, transformation_matrix = processFrame(img_curr, img_prev, S_prev, params, transformation_matrix)
+        #cv.imshow("Image", image_1)
+        #cv.destroyWindow("Image")
+        #cv.waitKey(500)
+        
+        inlier_pts1, keypoints_1, descriptor_1, inliers, initial_landmarks = continuous_operation.processFrame(image_1, image_0, inlier_pts1, keypoints_1, descriptor_1, inliers, R, t, params, transformation_matrix, initial_landmarks)
+
+        time.sleep(0.01)    
 
 
 else:
